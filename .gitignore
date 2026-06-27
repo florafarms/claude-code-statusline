@@ -1,0 +1,4 @@
+.DS_Store
+*.log
+.statusline_cache.json
+.quota_last_seen.json
