@@ -23,11 +23,11 @@ Estimated values are prefixed with `~` and show `⚠ datos Xm` if the Anthropic 
 ## Install — one command
 
 ```bash
-git clone https://github.com/<USER>/claude-code-statusline.git ~/claude-code-statusline \
+git clone https://github.com/florafarms/claude-code-statusline.git ~/claude-code-statusline \
   && bash ~/claude-code-statusline/install.sh
 ```
 
-> Replace `<USER>` with the GitHub user/org hosting this repo.
+> Replace `florafarms` with the GitHub user/org hosting this repo.
 
 After install, restart Claude Code (or run `/statusline`).
 
@@ -45,7 +45,7 @@ The script also caches the Anthropic quota response for **30 s** to avoid hittin
 
 Paste this prompt into a fresh Claude Code session:
 
-> Clone <https://github.com/USER/claude-code-statusline> into `~/claude-code-statusline` and run `install.sh`. Then verify by echoing test JSON into the script:
+> Clone <https://github.com/florafarms/claude-code-statusline> into `~/claude-code-statusline` and run `install.sh`. Then verify by echoing test JSON into the script:
 > `echo '{"cost":{"total_cost_usd":0}}' | bash ~/.claude/scripts/statusline.sh`
 > Show me the rendered output.
 
