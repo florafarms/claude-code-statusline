@@ -254,7 +254,7 @@ for fam, _ in MODEL_FAMILIES:
         robot = '🤖' if fam == active_fam else ''
         segs.append(f'{robot}{color}{letter} {fmt_tk(model_block[fam])}{X}')
 if segs:
-    parts.append('·'.join(segs))
+    parts.append(f' {D}-{X} '.join(segs))
 if quota_stale:
     parts.append(f'{D}⚠ datos {quota_age_min}m{X}')
 
