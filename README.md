@@ -3,7 +3,7 @@
 A drop-in statusline for [Claude Code](https://claude.com/claude-code) that shows your **real** plan usage — pulled from Anthropic's OAuth `/usage` endpoint, not just local token counts.
 
 ```
-💰 $0.52  🔥 $11.91/h  📊 5h 24% (4h20m)  🗓 7d 65% (5d04h)  F 3.1M·O 7.3M·S 3.2M
+💰 $0.52  🔥 $11.91/h  📊 5h 24% (4h20m)  🗓 7d 65% (5d04h)  Fable 3.1M/➤Opus 7.3M◄/Sonnet 3.2M
 ```
 
 | Segment | Meaning |
@@ -13,7 +13,8 @@ A drop-in statusline for [Claude Code](https://claude.com/claude-code) that show
 | 📊 `5h X%` | % consumed of the **5-hour rate-limit block** + time until reset |
 | 🗓 `7d X%` | % consumed of the **weekly limit** + time until reset (days when >24h, hours otherwise) |
 | 🧠 `Opus X%` | % of the weekly Opus quota (only when Anthropic reports it) |
-| `F / O / S / H` | Tokens spent in this block per model — **F**able (pink), **O**pus (magenta), **S**onnet (cyan), **H**aiku (green). Only models with usage are shown; Mythos counts as Fable |
+| `Fable / Opus / Sonnet / Haiku` | Tokens spent in this block per model — Fable (pink), Opus (magenta), Sonnet (cyan), Haiku (green). Names are separated by bold-black slashes. Only models with usage are shown; Mythos counts as Fable |
+| `➤...◄` | The **active model** is bracketed by red arrows and underlined (keeping its family color), so you can see at a glance which model this session is on. Always shown even with zero tokens |
 
 Color thresholds: **green** <50% · **yellow** <80% · **red** ≥80%.
 Estimated values are prefixed with `~` and show `⚠ datos Xm` if the Anthropic endpoint is unreachable.
