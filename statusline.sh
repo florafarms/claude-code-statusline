@@ -2,7 +2,31 @@
 INPUT=$(cat)
 export STATUSLINE_INPUT="$INPUT"
 
-python3 << 'PYEOF'
+# Pick a Python interpreter that actually runs. On Windows, `python3`/`python`
+# on PATH can be a Microsoft Store "app execution alias" stub — it exists and
+# passes `command -v`, but running it just pops a Store-install prompt instead
+# of executing code. Probe candidates for real; fall back to common winget/
+# python.org install locations if the PATH ones are the broken stub.
+PYTHON_BIN=""
+for cand in python3 python; do
+  if command -v "$cand" >/dev/null 2>&1 && "$cand" -c "" >/dev/null 2>&1; then
+    PYTHON_BIN="$cand"
+    break
+  fi
+done
+if [ -z "$PYTHON_BIN" ] && [ -n "${LOCALAPPDATA:-}" ]; then
+  for cand in "$LOCALAPPDATA"/Programs/Python/Python3*/python.exe; do
+    if [ -x "$cand" ] && "$cand" -c "" >/dev/null 2>&1; then
+      PYTHON_BIN="$cand"
+      break
+    fi
+  done
+fi
+PYTHON_BIN="${PYTHON_BIN:-python3}"
+
+# Windows console codepages (cp1252, etc.) choke on the emoji below; forcing
+# UTF-8 is a no-op on macOS/Linux where it's already the default.
+PYTHONIOENCODING=utf-8 "$PYTHON_BIN" << 'PYEOF'
 import json, os, subprocess, time, glob
 from datetime import datetime, timezone, timedelta
 
@@ -51,11 +75,21 @@ if cache is None:
     cache = {'quota': None, 'block': None, 'daily': None}
     # 1) Cuota oficial Anthropic
     try:
-        tok_raw = subprocess.run(
-            ['security', 'find-generic-password', '-s', 'Claude Code-credentials', '-w'],
-            capture_output=True, text=True, timeout=3
-        ).stdout.strip()
-        token = json.loads(tok_raw)['claudeAiOauth']['accessToken']
+        token = None
+        try:
+            # macOS: token vive en Keychain
+            tok_raw = subprocess.run(
+                ['security', 'find-generic-password', '-s', 'Claude Code-credentials', '-w'],
+                capture_output=True, text=True, timeout=3
+            ).stdout.strip()
+            token = json.loads(tok_raw)['claudeAiOauth']['accessToken']
+        except Exception:
+            token = None
+        if not token:
+            # Windows/Linux: Claude Code guarda las credenciales en un JSON local
+            creds_file = os.path.expanduser('~/.claude/.credentials.json')
+            with open(creds_file) as f:
+                token = json.load(f)['claudeAiOauth']['accessToken']
         r = subprocess.run([
             'curl', '-sS', '--max-time', '4',
             '-H', f'Authorization: Bearer {token}',

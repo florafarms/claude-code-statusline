@@ -56,8 +56,8 @@ The installer is idempotent — re-running it just refreshes the script.
 
 ## Requirements
 
-- **macOS or Linux** (macOS gets the Anthropic quota readout for free via Keychain; Linux can supply a token via env var — see *Linux notes* below)
-- **Python 3** (built-in on macOS)
+- **macOS, Linux, or Windows** (macOS reads the OAuth token from Keychain; Linux/Windows read it straight from Claude Code's own credentials file — see *Windows / Linux notes* below)
+- **Python 3** (built-in on macOS; see Windows notes if `python3`/`python` resolve to a Microsoft Store stub)
 - **curl**
 - **Claude Code** already authenticated (`claude /login` once)
 - **Optional but recommended:** [`ccusage`](https://github.com/ryoppippi/ccusage) — `npm i -g ccusage` — enables burn-rate and per-model breakdown
@@ -66,11 +66,13 @@ The installer is idempotent — re-running it just refreshes the script.
 
 ## How the % numbers work
 
-The script reads `https://api.anthropic.com/api/oauth/usage` with the OAuth token Claude Code already stored in your macOS Keychain:
+The script reads `https://api.anthropic.com/api/oauth/usage` with the OAuth token Claude Code already stored — on macOS, via Keychain:
 
 ```
 security find-generic-password -s "Claude Code-credentials" -w
 ```
+
+On Windows/Linux, from Claude Code's own credentials file instead (see *Windows / Linux notes* below).
 
 That endpoint returns the **real** `five_hour.utilization`, `seven_day.utilization`, and `seven_day_opus.utilization` — the same numbers you see at <https://claude.ai/settings/usage>.
 
@@ -87,12 +89,17 @@ Estimated values are prefixed `~` so you always know whether you're looking at g
 
 ---
 
-## Linux notes
+## Windows / Linux notes
 
-The Anthropic OAuth token isn't in Keychain on Linux. Two options:
+There's no Keychain outside macOS, but you don't need one: Claude Code stores the same OAuth token (`claudeAiOauth.accessToken`) in plain JSON at `~/.claude/.credentials.json` on every platform. The script tries Keychain first and, if that fails or isn't available, reads that file directly — so real quota % (not just the ccusage estimate) works on Windows and Linux too, no extra setup needed.
 
-1. **Disable quota readout** — script will gracefully fall back to ccusage-based estimates.
-2. **Provide the token via env var** — edit the script's `subprocess.run(['security', ...])` block to read from `$ANTHROPIC_CLAUDE_CODE_OAUTH_TOKEN` instead. (Roadmap.)
+**Windows-specific gotcha:** `python3`/`python` on PATH can silently be a Microsoft Store "app execution alias" stub — `command -v` finds it, but running it just opens the Store instead of executing code. The script probes candidates for real (`"$cand" -c ""`) before using them, and falls back to scanning `%LOCALAPPDATA%\Programs\Python\Python3*\python.exe` (the typical `winget install Python.Python.3.x` / python.org installer location) if PATH only offers the broken stub. If you hit this, install a real Python with:
+
+```bash
+winget install --id Python.Python.3.12 -e --source winget
+```
+
+Also note Windows consoles default to a legacy codepage (cp1252) that can't print the emoji this script uses — it forces `PYTHONIOENCODING=utf-8` before invoking Python to avoid a crash. This is a no-op on macOS/Linux.
 
 ---
 
