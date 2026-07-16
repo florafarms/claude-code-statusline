@@ -1,9 +1,9 @@
-# Claude Code Statusline — Real Quota %, Burn Rate, Opus/Sonnet Breakdown
+# Claude Code Statusline — Real Quota %, Burn Rate, Per-Model Breakdown
 
 A drop-in statusline for [Claude Code](https://claude.com/claude-code) that shows your **real** plan usage — pulled from Anthropic's OAuth `/usage` endpoint, not just local token counts.
 
 ```
-💰 $0.52  🔥 $11.91/h  📊 5h 24% (4h20m)  🗓 7d 65% (5d04h)  O 7.3M·S 3.2M
+💰 $0.52  🔥 $11.91/h  📊 5h 24% (4h20m)  🗓 7d 65% (5d04h)  F 3.1M·O 7.3M·S 3.2M
 ```
 
 | Segment | Meaning |
@@ -13,7 +13,7 @@ A drop-in statusline for [Claude Code](https://claude.com/claude-code) that show
 | 📊 `5h X%` | % consumed of the **5-hour rate-limit block** + time until reset |
 | 🗓 `7d X%` | % consumed of the **weekly limit** + time until reset (days when >24h, hours otherwise) |
 | 🧠 `Opus X%` | % of the weekly Opus quota (only when Anthropic reports it) |
-| `O / S` | Tokens spent in this block by Opus / Sonnet |
+| `F / O / S / H` | Tokens spent in this block per model — **F**able (pink), **O**pus (magenta), **S**onnet (cyan), **H**aiku (green). Only models with usage are shown; Mythos counts as Fable |
 
 Color thresholds: **green** <50% · **yellow** <80% · **red** ≥80%.
 Estimated values are prefixed with `~` and show `⚠ datos Xm` if the Anthropic endpoint is unreachable.

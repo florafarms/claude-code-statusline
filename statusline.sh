@@ -14,8 +14,10 @@ O    = '\033[38;5;208m'
 G    = '\033[92m'
 B    = '\033[94m'
 Y    = '\033[93m'
-M    = '\033[95m'   # Opus
-C    = '\033[96m'   # Sonnet
+M    = '\033[95m'         # Opus
+C    = '\033[96m'         # Sonnet
+F    = '\033[38;5;213m'   # Fable
+H    = '\033[92m'         # Haiku
 GR   = '\033[90m'
 D    = '\033[2m'
 X    = '\033[0m'
@@ -141,9 +143,13 @@ burn_per_h = (block.get('burnRate') or {}).get('costPerHour', 0)
 block_tokens = block.get('totalTokens', 0)
 remain_min_block = (block.get('projection') or {}).get('remainingMinutes', 0)
 
-# --- Desglose Opus/Sonnet del bloque (parseando JSONLs) ---
-opus_block = 0
-sonnet_block = 0
+# --- Desglose por modelo del bloque (parseando JSONLs) ---
+# 'mythos' comparte modelo con Fable; se agrupa como Fable
+MODEL_FAMILIES = [('fable', ['fable', 'mythos']),
+                  ('opus', ['opus']),
+                  ('sonnet', ['sonnet']),
+                  ('haiku', ['haiku'])]
+model_block = {fam: 0 for fam, _ in MODEL_FAMILIES}
 start_iso = block.get('startTime')
 if start_iso:
     try:
@@ -166,8 +172,10 @@ if start_iso:
                             tk = (u.get('input_tokens', 0) + u.get('output_tokens', 0)
                                   + u.get('cache_creation_input_tokens', 0)
                                   + u.get('cache_read_input_tokens', 0))
-                            if 'opus' in model:   opus_block += tk
-                            elif 'sonnet' in model: sonnet_block += tk
+                            for fam, keys in MODEL_FAMILIES:
+                                if any(k in model for k in keys):
+                                    model_block[fam] += tk
+                                    break
                         except: continue
             except: continue
     except: pass
@@ -227,7 +235,13 @@ parts.append(f'📊 5h {pct_color(fh_pct)}{fmt_pct(fh_pct, fh_estimated)}{X} {D}
 parts.append(f'🗓 7d {pct_color(sd_pct)}{fmt_pct(sd_pct, sd_estimated)}{X} {D}({sd_reset or "?"}){X}')
 if op_pct is not None:
     parts.append(f'🧠 Opus {pct_color(op_pct)}{fmt_pct(op_pct)}{X}')
-parts.append(f'{M}O {fmt_tk(opus_block)}{X}·{C}S {fmt_tk(sonnet_block)}{X}')
+MODEL_STYLES = {'fable': ('F', F), 'opus': ('O', M), 'sonnet': ('S', C), 'haiku': ('H', H)}
+model_seg = '·'.join(
+    f'{MODEL_STYLES[fam][1]}{MODEL_STYLES[fam][0]} {fmt_tk(model_block[fam])}{X}'
+    for fam, _ in MODEL_FAMILIES if model_block[fam] > 0
+)
+if model_seg:
+    parts.append(model_seg)
 if quota_stale:
     parts.append(f'{D}⚠ datos {quota_age_min}m{X}')
 
