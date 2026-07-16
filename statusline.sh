@@ -245,7 +245,7 @@ parts.append(f'📊 5h {pct_color(fh_pct)}{fmt_pct(fh_pct, fh_estimated)}{X} {D}
 parts.append(f'🗓 7d {pct_color(sd_pct)}{fmt_pct(sd_pct, sd_estimated)}{X} {D}({sd_reset or "?"}){X}')
 if op_pct is not None:
     parts.append(f'🧠 Opus {pct_color(op_pct)}{fmt_pct(op_pct)}{X}')
-MODEL_STYLES = {'fable': ('F', F), 'opus': ('O', M), 'sonnet': ('S', C), 'haiku': ('H', H)}
+MODEL_STYLES = {'fable': ('Fable', F), 'opus': ('Opus', M), 'sonnet': ('Sonnet', C), 'haiku': ('Haiku', H)}
 segs = []
 for fam, _ in MODEL_FAMILIES:
     # Mostrar familia si tiene uso en el bloque, o si es el modelo activo ahora
