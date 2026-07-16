@@ -251,7 +251,7 @@ for fam, _ in MODEL_FAMILIES:
     # Mostrar familia si tiene uso en el bloque, o si es el modelo activo ahora
     if model_block[fam] > 0 or fam == active_fam:
         letter, color = MODEL_STYLES[fam]
-        pointer = '👉' if fam == active_fam else ''
+        pointer = '\033[1;91m➤\033[0m' if fam == active_fam else ''
         segs.append(f'{pointer}{color}{letter} {fmt_tk(model_block[fam])}{X}')
 if segs:
     slash = '\033[1;30m/\033[0m'  # diagonal negro negrita
