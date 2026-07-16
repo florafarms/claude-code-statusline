@@ -19,7 +19,7 @@ command -v security >/dev/null 2>&1 || say "macOS Keychain not available (Linux/
 
 # 2) Optional: ccusage (improves burn-rate + token breakdown)
 if ! command -v ccusage >/dev/null 2>&1; then
-    say "ccusage not installed — burn rate and Opus/Sonnet breakdown will be limited."
+    say "ccusage not installed — burn rate and per-model breakdown will be limited."
     say "Install later with:  npm i -g ccusage   (or:  npx ccusage)"
 fi
 
