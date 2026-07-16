@@ -28,14 +28,13 @@ session_cost = cost_data.get('total_cost_usd', 0)
 
 # Modelo activo de la sesión
 model_info    = data.get('model', {})
-active_model  = (model_info.get('display_name') or '').strip()
-active_lower  = active_model.lower()
-if   'fable'  in active_lower: active_color = '\033[38;5;213m'
-elif 'mythos' in active_lower: active_color = '\033[38;5;213m'
-elif 'opus'   in active_lower: active_color = '\033[95m'
-elif 'sonnet' in active_lower: active_color = '\033[96m'
-elif 'haiku'  in active_lower: active_color = '\033[92m'
-else:                          active_color = '\033[97m'
+active_lower  = (model_info.get('display_name') or '').lower()
+if   'mythos' in active_lower: active_fam = 'fable'
+elif 'fable'  in active_lower: active_fam = 'fable'
+elif 'opus'   in active_lower: active_fam = 'opus'
+elif 'sonnet' in active_lower: active_fam = 'sonnet'
+elif 'haiku'  in active_lower: active_fam = 'haiku'
+else:                          active_fam = None
 
 cache_file = os.path.expanduser('~/.claude/scripts/.statusline_cache.json')
 cache_ttl  = 30
@@ -240,8 +239,6 @@ def fmt_pct(p, est=False):
 
 # --- Salida ---
 parts = []
-if active_model:
-    parts.append(f'🤖 {active_color}{active_model}{X}')
 parts.append(f'💰 {GR}${session_cost:.2f}{X}')
 parts.append(f'🔥 {R}${burn_per_h:.2f}/h{X}')
 parts.append(f'📊 5h {pct_color(fh_pct)}{fmt_pct(fh_pct, fh_estimated)}{X} {D}({fh_reset or "?"}){X}')
@@ -249,12 +246,15 @@ parts.append(f'🗓 7d {pct_color(sd_pct)}{fmt_pct(sd_pct, sd_estimated)}{X} {D}
 if op_pct is not None:
     parts.append(f'🧠 Opus {pct_color(op_pct)}{fmt_pct(op_pct)}{X}')
 MODEL_STYLES = {'fable': ('F', F), 'opus': ('O', M), 'sonnet': ('S', C), 'haiku': ('H', H)}
-model_seg = '·'.join(
-    f'{MODEL_STYLES[fam][1]}{MODEL_STYLES[fam][0]} {fmt_tk(model_block[fam])}{X}'
-    for fam, _ in MODEL_FAMILIES if model_block[fam] > 0
-)
-if model_seg:
-    parts.append(model_seg)
+segs = []
+for fam, _ in MODEL_FAMILIES:
+    # Mostrar familia si tiene uso en el bloque, o si es el modelo activo ahora
+    if model_block[fam] > 0 or fam == active_fam:
+        letter, color = MODEL_STYLES[fam]
+        robot = '🤖' if fam == active_fam else ''
+        segs.append(f'{robot}{color}{letter} {fmt_tk(model_block[fam])}{X}')
+if segs:
+    parts.append('·'.join(segs))
 if quota_stale:
     parts.append(f'{D}⚠ datos {quota_age_min}m{X}')
 
