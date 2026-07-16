@@ -251,8 +251,14 @@ for fam, _ in MODEL_FAMILIES:
     # Mostrar familia si tiene uso en el bloque, o si es el modelo activo ahora
     if model_block[fam] > 0 or fam == active_fam:
         letter, color = MODEL_STYLES[fam]
-        pointer = '\033[1;91m➤\033[0m' if fam == active_fam else ''
-        segs.append(f'{pointer}{color}{letter} {fmt_tk(model_block[fam])}{X}')
+        if fam == active_fam:
+            # Modelo activo: atrapado entre flechas rojas y subrayado en rojo
+            arrowL = '\033[1;91m➤\033[0m'
+            arrowR = '\033[1;91m◄\033[0m'
+            body   = f'\033[4;91m{letter} {fmt_tk(model_block[fam])}\033[0m'
+            segs.append(f'{arrowL}{body}{arrowR}')
+        else:
+            segs.append(f'{color}{letter} {fmt_tk(model_block[fam])}{X}')
 if segs:
     slash = '\033[1;30m/\033[0m'  # diagonal negro negrita
     parts.append(slash.join(segs))
