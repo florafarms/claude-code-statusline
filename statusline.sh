@@ -26,6 +26,17 @@ SEP  = f' {D}|{X} '
 cost_data    = data.get('cost', {})
 session_cost = cost_data.get('total_cost_usd', 0)
 
+# Modelo activo de la sesión
+model_info    = data.get('model', {})
+active_model  = (model_info.get('display_name') or '').strip()
+active_lower  = active_model.lower()
+if   'fable'  in active_lower: active_color = '\033[38;5;213m'
+elif 'mythos' in active_lower: active_color = '\033[38;5;213m'
+elif 'opus'   in active_lower: active_color = '\033[95m'
+elif 'sonnet' in active_lower: active_color = '\033[96m'
+elif 'haiku'  in active_lower: active_color = '\033[92m'
+else:                          active_color = '\033[97m'
+
 cache_file = os.path.expanduser('~/.claude/scripts/.statusline_cache.json')
 cache_ttl  = 30
 
@@ -229,6 +240,8 @@ def fmt_pct(p, est=False):
 
 # --- Salida ---
 parts = []
+if active_model:
+    parts.append(f'🤖 {active_color}{active_model}{X}')
 parts.append(f'💰 {GR}${session_cost:.2f}{X}')
 parts.append(f'🔥 {R}${burn_per_h:.2f}/h{X}')
 parts.append(f'📊 5h {pct_color(fh_pct)}{fmt_pct(fh_pct, fh_estimated)}{X} {D}({fh_reset or "?"}){X}')
