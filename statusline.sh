@@ -287,7 +287,7 @@ for fam, _ in MODEL_FAMILIES:
         letter, color = MODEL_STYLES[fam]
         if fam == active_fam:
             # Modelo activo: atrapado entre flechas rojas y subrayado en rojo
-            arrowL = '\033[1;91m➤\033[0m'
+            arrowL = '\033[1;91m◄\033[0m'
             arrowR = '\033[1;91m◄\033[0m'
             body   = f'\033[4m{color}{letter} {fmt_tk(model_block[fam])}\033[0m'
             segs.append(f'{arrowL}{body}{arrowR}')
